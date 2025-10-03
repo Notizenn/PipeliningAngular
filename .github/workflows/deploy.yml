@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]   # déclenché quand une PR est mergée sur main
+    branches: [main]   # déclenché après merge de PR dans main
 
 permissions:
   contents: read
@@ -35,12 +35,18 @@ jobs:
         working-directory: hello_world
         run: |
           npm run build -- --configuration production --base-href "/${{ github.event.repository.name }}/"
-          cp dist/*/browser/index.html dist/*/browser/404.html
+          # SPA fallback pour GitHub Pages
+          cp dist/pipelining/index.html dist/pipelining/404.html
+
+      - name: Show build output (debug)
+        run: |
+          ls -la hello_world/dist
+          ls -la hello_world/dist/pipelining
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: hello_world/dist/*/browser
+          path: hello_world/dist/pipelining
 
   deploy:
     runs-on: ubuntu-latest
