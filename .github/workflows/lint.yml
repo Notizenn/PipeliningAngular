@@ -1,0 +1,40 @@
+name: Lint PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]   
+    paths:
+      - "**/*.js"
+      - "**/*.jsx"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "package.json"
+      - "package-lock.json"
+      - ".eslintrc*"
+
+permissions:
+  contents: read
+  pull-requests: write  
+
+jobs:
+  eslint:
+    name: ESLint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install deps (clean, reproductible)
+        run: npm ci
+
+    
+      - name: Run ESLint
+        run: npx eslint . --ext .js,.jsx,.ts,.tsx --max-warnings=0
